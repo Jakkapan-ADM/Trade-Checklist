@@ -92,6 +92,15 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   </div>
 </section>
 
+<section class="step" id="s4">
+  <p class="q">4. เข้าออเดอร์ที่ปลายไส้ H1 ไหม</p>
+  <p class="hint">Sell = ปลายไส้บนของแท่ง H1 · Buy = ปลายไส้ล่าง</p>
+  <div class="opts" data-key="wick">
+    <button class="opt" data-v="yes">ใช่ ที่ปลายไส้</button>
+    <button class="opt" data-v="no">ไม่ใช่</button>
+  </div>
+</section>
+
 <section class="verdict wait" id="verdict">
   <p class="big" id="vt"></p><p id="vd"></p>
 </section>
@@ -99,7 +108,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 <script>
 (function(){
-  var S={h1:null,time:null,type:null,dir:null};
+  var S={h1:null,time:null,type:null,dir:null,wick:null};
   try{var saved=JSON.parse(localStorage.getItem('tc_state')||'null');if(saved)S=Object.assign(S,saved);}catch(e){}
   var root=document.documentElement;
   try{var th=localStorage.getItem('tc_theme');if(th)root.setAttribute('data-theme',th);}catch(e){}
@@ -125,14 +134,16 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     if(S.type==='none')s3='bad';
     else if(showDir&&S.dir){s3=(want&&S.dir===want)?'ok':'warn';}
     mark('s3',s3);
+    mark('s4',S.wick==null?'':S.wick==='yes'?'ok':'bad');
 
     var v=document.getElementById('verdict'),t=document.getElementById('vt'),d=document.getElementById('vd');
-    var cls='wait',title='รอเช็คให้ครบ',desc='ตอบให้ครบ 3 ข้อเพื่อดูสรุป';
+    var cls='wait',title='รอเช็คให้ครบ',desc='ตอบให้ครบ 4 ข้อเพื่อดูสรุป';
     if(S.h1==='none'){cls='wait';title='ยังไม่มีเซ็ตอัพ';desc='H1 ไม่อยู่โซน Overbought/Oversold · รอก่อน';}
     else if(S.time==='no'){cls='wait';title='นอกช่วงเวลา';desc='ไม่ใช่ช่วง 2 ทุ่ม · รอก่อนหรือข้ามรอบนี้';}
+    else if(S.wick==='no'){cls='wait';title='ไม่ใช่ปลายไส้ H1';desc='ราคายังไม่ถึงปลายไส้ H1 · รอก่อน';}
     else if(S.type==='none'){cls='wait';title='รอ M5 ยืนยัน';desc='ยังไม่เกิด CHoCH/BOS · ห้ามเข้าก่อน';}
-    else if(S.h1&&S.time&&showDir&&S.dir){
-      if(S.dir===want){cls=bias;title='เข้าได้ฝั่ง '+bias.toUpperCase();desc='H1 + เวลา + M5 '+(S.type==='choch'?'CHoCH':'BOS')+' ไปทางเดียวกัน';}
+    else if(S.h1&&S.time&&S.wick&&showDir&&S.dir){
+      if(S.dir===want){cls=bias;title='เข้าได้ฝั่ง '+bias.toUpperCase();desc='H1 + เวลา + ปลายไส้ + M5 '+(S.type==='choch'?'CHoCH':'BOS')+' ไปทางเดียวกัน';}
       else{cls='wait';title='สัญญาณสวนกัน';desc='M5 เบรกสวนกับฝั่ง H1 ('+(bias||'').toUpperCase()+') · รอก่อน';}
     }
     v.className='verdict '+cls;t.textContent=title;d.textContent=desc;
@@ -145,7 +156,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
       var k=g.dataset.key;S[k]=(S[k]===b.dataset.v)?null:b.dataset.v;render();
     });
   });
-  document.getElementById('reset').onclick=function(){S={h1:null,time:null,type:null,dir:null};render();};
+  document.getElementById('reset').onclick=function(){S={h1:null,time:null,type:null,dir:null,wick:null};render();};
   document.getElementById('theme').onclick=function(){
     var cur=root.getAttribute('data-theme');
     var dark=cur?cur==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;
